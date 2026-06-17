@@ -6,3 +6,10 @@ build/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Local Arduino project files (not needed on GitHub Pages)
+ESP32_SmartHome_4Lamp/
+ESP32_SmartHome_GitHub/
+Roda_Dua_PS4_Bluepad32/
+Roda_Empat_PS4_Bluepad32/
+Roda_Dua_PS4_Bluepad32.rar
