@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skagata Pintar - Dashboard Smart Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --color-on: #38bdf8;
+      --color-on-glow: rgba(56, 189, 248, 0.4);
+      --color-off: #475569;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(to right, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+    header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    @media(max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .card.active {
+      box-shadow: 0 10px 25px var(--color-on-glow);
+      border-color: var(--color-on);
+    }
+    .icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      color: var(--text-secondary);
+    }
+    .card.active .icon-wrapper {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--color-on);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .card-status {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .card.active .card-status {
+      color: var(--color-on);
+      font-weight: 600;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--color-off);
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--color-on);
+    }
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+      padding-top: 20px;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .status-indicator {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+    .dot.online {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    /* Modal Settings */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal-content {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .modal h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 10px;
+      border-radius: 10px;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--color-on);
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    /* Loader overlay */
+    .loader-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 24px;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top-color: var(--color-on);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="loader-overlay" id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <header>
+      <h1>Skagata Pintar</h1>
+      <p>Dashboard Smart Home Online</p>
+    </header>
+
+    <div class="grid">
+      <!-- Lampu 1 -->
+      <div class="card" id="card-1">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        </div>
+        <div class="card-title">Lampu Teras</div>
+        <div class="card-status" id="status-1">Mati</div>
+        <label class="switch">
+          <input type="checkbox" id="switch-1" onchange="toggleLight(1)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <!-- Lampu 2 -->
+      <div class="card" id="card-2">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        </div>
+        <div class="card-title">Lampu R. Tamu</div>
+        <div class="card-status" id="status-2">Mati</div>
+        <label class="switch">
+          <input type="checkbox" id="switch-2" onchange="toggleLight(2)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <!-- Lampu 3 -->
+      <div class="card" id="card-3">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        </div>
+        <div class="card-title">Lampu Kamar</div>
+        <div class="card-status" id="status-3">Mati</div>
+        <label class="switch">
+          <input type="checkbox" id="switch-3" onchange="toggleLight(3)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <!-- Lampu 4 -->
+      <div class="card" id="card-4">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        </div>
+        <div class="card-title">Lampu Dapur</div>
+        <div class="card-status" id="status-4">Mati</div>
+        <label class="switch">
+          <input type="checkbox" id="switch-4" onchange="toggleLight(4)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <div class="status-indicator">
+        <div class="dot" id="status-dot"></div>
+        <span id="connection-text">Terputus (Belum Setting)</span>
+      </div>
+      <button class="btn" onclick="openSettings()">Pengaturan API</button>
+    </div>
+  </div>
+
+  <!-- Modal Pengaturan -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <h2>Pengaturan GitHub</h2>
+      <div class="form-group">
+        <label for="input-username">Username GitHub</label>
+        <input type="text" id="input-username" placeholder="contoh: jumari">
+      </div>
+      <div class="form-group">
+        <label for="input-repo">Nama Repository</label>
+        <input type="text" id="input-repo" placeholder="contoh: SmartHome">
+      </div>
+      <div class="form-group">
+        <label for="input-branch">Branch</label>
+        <input type="text" id="input-branch" placeholder="main atau master">
+      </div>
+      <div class="form-group">
+        <label for="input-token">Personal Access Token (PAT)</label>
+        <input type="password" id="input-token" placeholder="ghp_xxxxxxxxxxxxxx">
+      </div>
+      <div class="modal-buttons">
+        <button class="btn" onclick="closeSettings(false)">Batal</button>
+        <button class="btn" style="background: var(--color-on); color: #0f172a; border-color: var(--color-on);" onclick="closeSettings(true)">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let config = {
+      username: '',
+      repo: '',
+      branch: 'main',
+      token: ''
+    };
+
+    let fileSha = ''; // Diperlukan oleh GitHub API untuk update file
+    let currentStates = { lampu1: false, lampu2: false, lampu3: false, lampu4: false };
+
+    // Load konfigurasi dari localStorage saat halaman dibuka
+    function loadConfig() {
+      const stored = localStorage.getItem('smarthome_config');
+      if (stored) {
+        config = JSON.parse(stored);
+        document.getElementById('input-username').value = config.username || '';
+        document.getElementById('input-repo').value = config.repo || '';
+        document.getElementById('input-branch').value = config.branch || 'main';
+        document.getElementById('input-token').value = config.token || '';
+        
+        if (config.token && config.username && config.repo) {
+          fetchStates();
+        } else {
+          openSettings();
+        }
+      } else {
+        // Default values untuk mempermudah user
+        document.getElementById('input-username').value = 'jumari';
+        document.getElementById('input-repo').value = 'SmartHome';
+        document.getElementById('input-branch').value = 'main';
+        openSettings();
+      }
+    }
+
+    function openSettings() {
+      document.getElementById('settings-modal').style.display = 'flex';
+    }
+
+    function closeSettings(save) {
+      if (save) {
+        config.username = document.getElementById('input-username').value.trim();
+        config.repo = document.getElementById('input-repo').value.trim();
+        config.branch = document.getElementById('input-branch').value.trim() || 'main';
+        config.token = document.getElementById('input-token').value.trim();
+        
+        localStorage.setItem('smarthome_config', JSON.stringify(config));
+        fetchStates();
+      }
+      document.getElementById('settings-modal').style.display = 'none';
+    }
+
+    function showLoader(show) {
+      document.getElementById('loader').style.display = show ? 'flex' : 'none';
+    }
+
+    function updateCardUI(id, state) {
+      const card = document.getElementById('card-' + id);
+      const status = document.getElementById('status-' + id);
+      const sw = document.getElementById('switch-' + id);
+      sw.checked = state;
+      if (state) {
+        card.classList.add('active');
+        status.innerText = 'Menyala';
+      } else {
+        card.classList.remove('active');
+        status.innerText = 'Mati';
+      }
+    }
+
+    // Mengambil status terupdate dari GitHub API (Real-time, tanpa cache)
+    function fetchStates() {
+      if (!config.token || !config.username || !config.repo) return;
+      
+      const url = `https://api.github.com/repos/${config.username}/${config.repo}/contents/status.json?ref=${config.branch}`;
+      
+      fetch(url, {
+        headers: {
+          'Authorization': `token ${config.token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal mengambil data dari GitHub. Periksa pengaturan Anda.');
+        return res.json();
+      })
+      .then(data => {
+        fileSha = data.sha;
+        // Decode base64 content
+        const decodedContent = atob(data.content.replace(/\s/g, ''));
+        currentStates = JSON.parse(decodedContent);
+        
+        updateCardUI(1, currentStates.lampu1);
+        updateCardUI(2, currentStates.lampu2);
+        updateCardUI(3, currentStates.lampu3);
+        updateCardUI(4, currentStates.lampu4);
+
+        const dot = document.getElementById('status-dot');
+        dot.classList.add('online');
+        document.getElementById('connection-text').innerText = 'Terhubung ke GitHub';
+      })
+      .catch(err => {
+        console.error(err);
+        const dot = document.getElementById('status-dot');
+        dot.classList.remove('online');
+        document.getElementById('connection-text').innerText = 'Koneksi Error';
+      });
+    }
+
+    // Mengubah status lampu via GitHub API (Kirim Update File)
+    function toggleLight(id) {
+      if (!config.token || !config.username || !config.repo) {
+        alert('Harap isi token dan pengaturan API terlebih dahulu.');
+        return;
+      }
+
+      showLoader(true);
+      
+      const sw = document.getElementById('switch-' + id);
+      const state = sw.checked;
+      
+      // Update state local sementara
+      currentStates[`lampu${id}`] = state;
+
+      const url = `https://api.github.com/repos/${config.username}/${config.repo}/contents/status.json`;
+      const body = {
+        message: `Mengubah lampu ${id} menjadi ${state ? 'ON' : 'OFF'} via Skagata Pintar Web`,
+        content: btoa(JSON.stringify(currentStates, null, 2)),
+        sha: fileSha,
+        branch: config.branch
+      };
+
+      fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${config.token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify(body)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal memperbarui status ke GitHub.');
+        return res.json();
+      })
+      .then(data => {
+        fileSha = data.content.sha; // Simpan SHA baru
+        updateCardUI(id, state);
+        showLoader(false);
+      })
+      .catch(err => {
+        alert(err.message);
+        // Kembalikan saklar ke kondisi semula jika gagal
+        sw.checked = !state;
+        updateCardUI(id, !state);
+        currentStates[`lampu${id}`] = !state;
+        showLoader(false);
+      });
+    }
+
+    // Inisialisasi awal saat dimuat
+    window.onload = function() {
+      // Inisialisasi setting awal
+      const stored = localStorage.getItem('smarthome_config');
+      if (!stored) {
+        // Buat dummy config awal
+        const dummy = {
+          username: 'jumari',
+          repo: 'SmartHome',
+          branch: 'main',
+          token: ''
+        };
+        localStorage.setItem('smarthome_config', JSON.stringify(dummy));
+      }
+      loadConfig();
+      // Sinkronisasi status setiap 8 detik
+      setInterval(fetchStates, 8000);
+    };
+  </script>
+</body>
+</html>
