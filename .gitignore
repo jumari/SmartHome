@@ -1,0 +1,8 @@
+# Arduino IDE build files
+build/
+*.local.txt
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
