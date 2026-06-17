@@ -1,6 +1,6 @@
 {
   "lampu1": true,
   "lampu2": true,
-  "lampu3": false,
+  "lampu3": true,
   "lampu4": false
 }
